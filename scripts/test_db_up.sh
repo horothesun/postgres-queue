@@ -2,7 +2,8 @@
 
 export PGPASSWORD="test_pwd"
 
-TEST_USERNAME="postgres"
+TEST_DEFAULT_USER="postgres"
+TEST_DB_HOST="localhost"
 TEST_CONTAINER="test-postgres"
 TEST_DB_NAME="test_db"
 TEST_DB_PORT="5432"
@@ -21,7 +22,14 @@ sleep 3
 
 echo "Creating DB..."
 psql \
-  --host localhost \
+  --host "${TEST_DB_HOST}" \
   --port "${TEST_DB_PORT}" \
-  --username "${TEST_USERNAME}" \
+  --username "${TEST_DEFAULT_USER}" \
   --command "CREATE DATABASE ${TEST_DB_NAME};"
+
+echo "Apply schema..."
+psql \
+  --host "${TEST_DB_HOST}" \
+  --port "${TEST_DB_PORT}" \
+  --username "${TEST_DEFAULT_USER}" \
+  --file scripts/schema.sql

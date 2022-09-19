@@ -28,11 +28,11 @@ object Dependencies {
     "ch.qos.logback" % "logback-classic" % Version.logbackClassic
   )
 
-  lazy val test: Seq[ModuleID] = Seq(
+  lazy val test: Seq[ModuleID] = List(
     "io.circe" %% "circe-parser" % Version.circe,
-    "org.scalameta" %% "munit-scalacheck" % Version.munit % Test,
-    "org.typelevel" %% "munit-cats-effect-3" % Version.munitCatsEffect3 % Test
-  )
+    "org.scalameta" %% "munit-scalacheck" % Version.munit,
+    "org.typelevel" %% "munit-cats-effect-3" % Version.munitCatsEffect3
+  ).flatMap(d => List(d % Test, d % IntegrationTest))
 
   lazy val core = libraryDependencies ++= (project ++ logs ++ test)
 
