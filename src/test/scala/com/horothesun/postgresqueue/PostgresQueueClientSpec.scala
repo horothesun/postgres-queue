@@ -1,11 +1,17 @@
 package com.horothesun.postgresqueue
 
-import munit.ScalaCheckSuite
+import cats.effect._
+import munit.CatsEffectSuite
+import skunk.Session
 
-class PostgresQueueClientSpec extends ScalaCheckSuite {
+class PostgresQueueClientSpec extends CatsEffectSuite {
 
-  test("1 + 1 = 2") {
-    assertEquals(1 + 1, 2)
+  val session: Resource[IO, Session[IO]] = TestDbClient.session
+
+  test("") {
+    session.use { s =>
+      IO(42)
+    }.assertEquals(42)
   }
 
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PGPASSWORD="mypwd"
+export PGPASSWORD="test_pwd"
 
 TEST_USERNAME="postgres"
 TEST_CONTAINER="test-postgres"
