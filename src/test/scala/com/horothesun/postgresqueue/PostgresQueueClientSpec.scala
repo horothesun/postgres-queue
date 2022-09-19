@@ -8,7 +8,7 @@ class PostgresQueueClientSpec extends CatsEffectSuite {
 
   val session: Resource[IO, Session[IO]] = TestDbClient.session
 
-  test("") {
+  test("integration test 1") {
     session.use { s =>
       IO(42)
     }.assertEquals(42)
