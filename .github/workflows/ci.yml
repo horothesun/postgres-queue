@@ -24,7 +24,7 @@ jobs:
       run: |
         ./scripts/test_db_up.sh
         sbt test
-        /scripts/test_db_down.sh
+        ./scripts/test_db_down.sh
 
   shellcheck:
     runs-on: ubuntu-latest
