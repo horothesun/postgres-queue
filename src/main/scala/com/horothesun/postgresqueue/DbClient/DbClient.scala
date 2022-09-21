@@ -1,4 +1,4 @@
-package com.horothesun.postgresqueue
+package com.horothesun.postgresqueue.DbClient
 
 /*
 psql --host localhost --port 5432 --username postgres --password --quiet --no-align --tuples-only
