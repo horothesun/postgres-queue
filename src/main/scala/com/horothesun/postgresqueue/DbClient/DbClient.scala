@@ -2,6 +2,7 @@ package com.horothesun.postgresqueue.DbClient
 
 import cats.effect.IO
 import com.horothesun.postgresqueue.DbClient.Models._
+import com.horothesun.postgresqueue.Models._
 import skunk.Session
 
 /*
@@ -25,17 +26,32 @@ ORDER BY m.enqueued_at DESC, m.message_id DESC
 LIMIT 1;
  */
 trait DbClient {
-  def insertQueues(queues: List[QueueRow]): IO[Unit]
-  def insertMessages(messages: List[MessageRow]): IO[Unit]
+  def insertQueue(queue: QueueRow): IO[Unit]
+  def insertMessage(message: MessageRow): IO[Unit]
+  def getAllQueues: IO[List[QueueRow]]
+  def getAllMessages: IO[List[MessageRow]]
+  def getQueue(queueName: QueueName): IO[Option[QueueRow]]
+  def getTopMessage(queueName: QueueName): IO[Option[MessageRow]]
+  def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]]
 }
 
 object DbClient {
 
   def create(session: Session[IO]): DbClient = new DbClient {
 
-    override def insertQueues(queues: List[QueueRow]): IO[Unit] = ???
+    override def insertQueue(queue: QueueRow): IO[Unit] = ???
 
-    override def insertMessages(messages: List[MessageRow]): IO[Unit] = ???
+    override def insertMessage(message: MessageRow): IO[Unit] = ???
+
+    override def getAllQueues: IO[List[QueueRow]] = ???
+
+    override def getAllMessages: IO[List[MessageRow]] = ???
+
+    override def getQueue(queueName: QueueName): IO[Option[QueueRow]] = ???
+
+    override def getTopMessage(queueName: QueueName): IO[Option[MessageRow]] = ???
+
+    override def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]] = ???
 
   }
 

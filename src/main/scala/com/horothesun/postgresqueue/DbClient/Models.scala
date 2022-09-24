@@ -1,44 +1,44 @@
 package com.horothesun.postgresqueue.DbClient
 
 import com.horothesun.postgresqueue.Models._
-import skunk.Encoder
 import skunk.codec.all._
+import skunk.Codec
 
 import java.time.LocalDateTime
 
 object Models {
 
   case class QueueRow(
-    name: Queue.Name,
-    visibilityTimeout: Queue.VisibilityTimeout
+    name: QueueName,
+    visibilityTimeout: Option[QueueVisibilityTimeout]
   )
   object QueueRow {
-    implicit val skunkEncoder: Encoder[QueueRow] =
+
+    implicit val codec: Codec[QueueRow] =
       (
-        Queue.Name.skunkEncoder ~
-          Queue.VisibilityTimeout.skunkEncoder
-      ).values.contramap[QueueRow](q => (q.name, q.visibilityTimeout))
+        QueueName.codec ~
+          QueueVisibilityTimeout.codec.opt
+      ).gimap[QueueRow]
   }
 
   case class MessageRow(
-    id: Message.Id,
-    queueName: Queue.Name,
-    body: Message.Body,
+    id: MessageId,
+    queueName: QueueName,
+    body: MessageBody,
     enqueuedAt: LocalDateTime,
-    lastReadAt: LocalDateTime,
-    dequeuedAt: LocalDateTime
+    lastReadAt: Option[LocalDateTime],
+    dequeuedAt: Option[LocalDateTime]
   )
   object MessageRow {
-    implicit val skunkEncoder: Encoder[MessageRow] =
+    implicit val codec: Codec[MessageRow] =
       (
-        Message.Id.skunkEncoder ~
-          Queue.Name.skunkEncoder ~
-          Message.Body.skunkEncoder ~
+        MessageId.codec ~
+          QueueName.codec ~
+          MessageBody.codec ~
           timestamp ~
-          timestamp ~
-          timestamp
-      ).values
-        .contramap[MessageRow](m => (((((m.id, m.queueName), m.body), m.enqueuedAt), m.lastReadAt), m.dequeuedAt))
+          timestamp.opt ~
+          timestamp.opt
+      ).gimap[MessageRow]
   }
 
 }
