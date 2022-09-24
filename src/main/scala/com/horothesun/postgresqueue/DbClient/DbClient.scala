@@ -1,5 +1,9 @@
 package com.horothesun.postgresqueue.DbClient
 
+import cats.effect.IO
+import com.horothesun.postgresqueue.DbClient.Models._
+import skunk.Session
+
 /*
 psql --host localhost --port 5432 --username postgres --password --quiet --no-align --tuples-only
 
@@ -20,4 +24,19 @@ WHERE m.queue_id = 123456
 ORDER BY m.enqueued_at DESC, m.message_id DESC
 LIMIT 1;
  */
-trait DbClient {}
+trait DbClient {
+  def insertQueues(queues: List[QueueRow]): IO[Unit]
+  def insertMessages(messages: List[MessageRow]): IO[Unit]
+}
+
+object DbClient {
+
+  def create(session: Session[IO]): DbClient = new DbClient {
+
+    override def insertQueues(queues: List[QueueRow]): IO[Unit] = ???
+
+    override def insertMessages(messages: List[MessageRow]): IO[Unit] = ???
+
+  }
+
+}

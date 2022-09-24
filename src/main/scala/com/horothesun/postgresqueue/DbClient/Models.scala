@@ -33,9 +33,12 @@ object Models {
       (
         Message.Id.skunkEncoder ~
           Queue.Name.skunkEncoder ~
-          Message.Body.skunkEncoder
-        // TODO: continue... 🔥🔥🔥
-      ).values.contramap[MessageRow](m => ((m.id, m.queueName), m.body))
+          Message.Body.skunkEncoder ~
+          timestamp ~
+          timestamp ~
+          timestamp
+      ).values
+        .contramap[MessageRow](m => (((((m.id, m.queueName), m.body), m.enqueuedAt), m.lastReadAt), m.dequeuedAt))
   }
 
 }
