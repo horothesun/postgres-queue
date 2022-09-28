@@ -27,9 +27,8 @@ object TestDbClient {
   def populateQueues(dbClient: DbClient): IO[Unit] =
     List(
       QueueRow(QueueName("queue-A"), Some(QueueVisibilityTimeout(1.seconds))),
-      QueueRow(QueueName("queue-B"), Some(QueueVisibilityTimeout(2.seconds))),
-      QueueRow(QueueName("queue-C"), Some(QueueVisibilityTimeout(3.seconds))),
-      QueueRow(QueueName("queue-D"), None)
+      QueueRow(QueueName("queue-B"), None),
+      QueueRow(QueueName("queue-C"), Some(QueueVisibilityTimeout(3.seconds)))
     ).traverse_(dbClient.insertQueue)
 
   def populateMessages(dbClient: DbClient): IO[Unit] =
