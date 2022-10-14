@@ -6,8 +6,8 @@ import com.horothesun.postgresqueue.DbClient._
 import com.horothesun.postgresqueue.DbClient.Models._
 import com.horothesun.postgresqueue.Models._
 import natchez.Trace.Implicits.noop
-import skunk._
 import skunk.implicits._
+import skunk.Session
 
 import java.time.LocalDateTime
 import scala.concurrent.duration._
@@ -22,7 +22,7 @@ object TestDbClient {
         .as(db)
     }
 
-  private def session: Resource[IO, Session[IO]] =
+  def session: Resource[IO, Session[IO]] =
     Session
       .single[IO](
         host = "localhost",
@@ -57,5 +57,11 @@ object TestDbClient {
       sql"TRUNCATE TABLE messages"
     ).map(_.command)
       .traverse_(s.execute)
+
+  def getTableNames(s: Session[IO]): IO[List[String]] =
+    s.execute(
+      sql"SELECT DISTINCT table_name FROM information_schema.columns"
+        .query(skunk.codec.all.name)
+    )
 
 }
