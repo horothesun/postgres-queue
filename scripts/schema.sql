@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS queues (
   queue_name VARCHAR ( 50 ) PRIMARY KEY,
-  visibility_timeout_sec INT
+  visibility_timeout_sec BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS messages (

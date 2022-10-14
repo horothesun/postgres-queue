@@ -18,11 +18,11 @@ object TestDbClient {
     session.flatMap { s =>
       val db = DbClient.create(s)
       Resource
-        .make(IO(()) /* populateQueues(db) >> populateMessages(db)*/ )(_ => IO(()) /*truncateAllTables(s)*/ )
+        .make(populateQueues(db) >> populateMessages(db))(_ => truncateAllTables(s))
         .as(db)
     }
 
-  def session: Resource[IO, Session[IO]] =
+  private def session: Resource[IO, Session[IO]] =
     Session
       .single[IO](
         host = "localhost",
@@ -52,16 +52,6 @@ object TestDbClient {
     ).traverse_(dbClient.insertMessage)
 
   private def truncateAllTables(s: Session[IO]): IO[Unit] =
-    List(
-      sql"TRUNCATE TABLE queues",
-      sql"TRUNCATE TABLE messages"
-    ).map(_.command)
-      .traverse_(s.execute)
-
-  def getTableNames(s: Session[IO]): IO[List[String]] =
-    s.execute(
-      sql"SELECT DISTINCT table_name FROM information_schema.columns"
-        .query(skunk.codec.all.name)
-    )
+    s.execute(sql"TRUNCATE TABLE queues, messages".command).void
 
 }

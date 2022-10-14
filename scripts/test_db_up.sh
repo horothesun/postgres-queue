@@ -29,15 +29,8 @@ psql \
   --command "CREATE DATABASE ${TEST_DB_NAME};"
 
 echo "Applying schema..."
-psql \
+psql "${TEST_DB_NAME}" \
   --host "${TEST_DB_HOST}" \
   --port "${TEST_DB_PORT}" \
   --username "${TEST_DEFAULT_USER}" \
   --file scripts/schema.sql
-
-#echo "Granting DB access..."
-#psql \
-#  --host "${TEST_DB_HOST}" \
-#  --port "${TEST_DB_PORT}" \
-#  --username "${TEST_DEFAULT_USER}" \
-#  --command "GRANT ALL PRIVILEGES ON DATABASE ${TEST_DB_NAME} TO ${TEST_DEFAULT_USER};"

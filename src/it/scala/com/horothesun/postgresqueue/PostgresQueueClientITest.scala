@@ -5,18 +5,16 @@ import munit.CatsEffectSuite
 
 class PostgresQueueClientITest extends CatsEffectSuite {
 
-  test("integration test 1") {
+  test("check queues") {
     testDbClient.use { db =>
-      db.getAllQueues
-    }
-      .assertEquals(List.empty)
+      db.getAllQueues.map(_.size)
+    }.assertEquals(3)
   }
 
-  test("integration test 2") {
-    session.use { s =>
-      getTableNames(s).map(_.filter(Set("messages", "queues").contains).sorted)
-    }
-      .assertEquals(List("messages", "queues"))
+  test("check messages") {
+    testDbClient.use { db =>
+      db.getAllMessages.map(_.size)
+    }.assertEquals(1)
   }
 
 }
