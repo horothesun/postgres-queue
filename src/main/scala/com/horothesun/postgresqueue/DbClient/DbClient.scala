@@ -42,13 +42,13 @@ object DbClient {
 
     override def insertQueue(queue: QueueRow): IO[Unit] =
       session
-        .prepare(sql"INSERT INTO queues VALUES ${QueueRow.codec}".command)
+        .prepare(sql"INSERT INTO queues VALUES (${QueueRow.codec})".command)
         .use(_.execute(queue))
         .void
 
     override def insertMessage(message: MessageRow): IO[Unit] =
       session
-        .prepare(sql"INSERT INTO messages VALUES ${MessageRow.codec}".command)
+        .prepare(sql"INSERT INTO messages VALUES (${MessageRow.codec})".command)
         .use(_.execute(message))
         .void
 

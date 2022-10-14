@@ -14,7 +14,15 @@ import scala.concurrent.duration._
 
 object TestDbClient {
 
-  val session: Resource[IO, Session[IO]] =
+  val testDbClient: Resource[IO, DbClient] =
+    session.flatMap { s =>
+      val db = DbClient.create(s)
+      Resource
+        .make(IO(()) /* populateQueues(db) >> populateMessages(db)*/ )(_ => IO(()) /*truncateAllTables(s)*/ )
+        .as(db)
+    }
+
+  private def session: Resource[IO, Session[IO]] =
     Session
       .single[IO](
         host = "localhost",
@@ -24,14 +32,14 @@ object TestDbClient {
         password = Some("test_pwd")
       )
 
-  def populateQueues(dbClient: DbClient): IO[Unit] =
+  private def populateQueues(dbClient: DbClient): IO[Unit] =
     List(
       QueueRow(QueueName("queue-A"), Some(QueueVisibilityTimeout(1.seconds))),
       QueueRow(QueueName("queue-B"), None),
       QueueRow(QueueName("queue-C"), Some(QueueVisibilityTimeout(3.seconds)))
     ).traverse_(dbClient.insertQueue)
 
-  def populateMessages(dbClient: DbClient): IO[Unit] =
+  private def populateMessages(dbClient: DbClient): IO[Unit] =
     List(
       MessageRow(
         MessageId(1),
@@ -43,7 +51,7 @@ object TestDbClient {
       )
     ).traverse_(dbClient.insertMessage)
 
-  def truncateAllTables(s: Session[IO]): IO[Unit] =
+  private def truncateAllTables(s: Session[IO]): IO[Unit] =
     List(
       sql"TRUNCATE TABLE queues",
       sql"TRUNCATE TABLE messages"
