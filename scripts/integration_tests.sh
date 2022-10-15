@@ -7,4 +7,4 @@ TESTS_EXIT_CODE="$?"
 
 ./scripts/test_db_down.sh
 
-exit "$TESTS_EXIT_CODE"
+exit "${TESTS_EXIT_CODE}"
