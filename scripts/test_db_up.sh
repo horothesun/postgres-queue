@@ -2,7 +2,7 @@
 
 export PGPASSWORD="test_pwd"
 
-POSTGRES_VERSION="14.5"
+POSTGRES_VERSION="15.0-alpine3.16"
 TEST_DEFAULT_USER="postgres"
 TEST_DB_HOST="localhost"
 TEST_CONTAINER="test-postgres"
@@ -19,7 +19,7 @@ docker run \
   "postgres:${POSTGRES_VERSION}"
 
 echo "Waiting for Postgres to be ready..."
-sleep 3
+sleep 1
 
 echo "Creating DB..."
 psql \

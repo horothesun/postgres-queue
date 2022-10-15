@@ -7,7 +7,7 @@ import skunk.implicits._
 import skunk.Session
 
 /*
-psql --host localhost --port 5432 --username postgres --password --quiet --no-align --tuples-only
+psql test_db --host localhost --port 5432 --username postgres --password --quiet --no-align --tuples-only
 
 EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)
 WITH vts AS (
