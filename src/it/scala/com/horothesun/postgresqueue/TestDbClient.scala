@@ -2,8 +2,8 @@ package com.horothesun.postgresqueue
 
 import cats.effect._
 import cats.implicits._
-import com.horothesun.postgresqueue.DbClient.Models._
-import com.horothesun.postgresqueue.DbClient._
+import com.horothesun.postgresqueue.dbclient.Models._
+import com.horothesun.postgresqueue.dbclient._
 import natchez.Trace.Implicits.noop
 import skunk.implicits._
 import skunk.Session

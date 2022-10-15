@@ -1,4 +1,4 @@
-package com.horothesun.postgresqueue.DbClient
+package com.horothesun.postgresqueue.dbclient
 
 import com.horothesun.postgresqueue.Models._
 import skunk.codec.all._
