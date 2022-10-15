@@ -27,7 +27,7 @@ class PostgresQueueClientITest extends CatsEffectSuite {
         _ <- populateMessages(db, messageRows)
         rs <- db.getAllMessages
       } yield rs
-    }.map(rs => assertEquals(rs.size, 1))
+    }.map(rs => assertEquals(rs.size, 1222))
   }
 
 }
