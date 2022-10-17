@@ -22,8 +22,8 @@ FROM messages AS m
 WHERE m.queue_name = 'queue-A'
   AND m.dequeued_at IS NULL
   AND (
-    m.last_read_at IS NULL
-    OR NOW() - m.last_read_at > ( SELECT * FROM vts ) * interval '1 second'
+       m.last_read_at IS NULL
+    OR (EXTRACT(EPOCH FROM NOW()) - EXTRACT(EPOCH FROM m.last_read_at)) > ( SELECT * FROM vts )
   )
 ORDER BY m.enqueued_at ASC, m.message_id DESC
 LIMIT 1;
@@ -107,29 +107,6 @@ object DbClient {
           """.query(MessageRow.codec)
         )
         .use(ps => ps.option(defaultVisibilityTimeout ~ queueName ~ queueName))
-
-//    override def getTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
-//      session
-//        .prepare(
-//          sql"""
-//            WITH vts AS (
-//              SELECT COALESCE(visibility_timeout_sec, ${QueueVisibilityTimeout.codec}) AS visibility_timeout_sec
-//              FROM queues
-//              WHERE queue_name = ${QueueName.codec}
-//            )
-//            SELECT message_id, queue_name, body, enqueued_at, last_read_at, dequeued_at
-//            FROM messages AS m
-//            WHERE m.queue_name = ${QueueName.codec}
-//              AND m.dequeued_at IS NULL
-//              AND (
-//                   m.last_read_at IS NULL
-//                OR NOW() - m.last_read_at > ( SELECT * FROM vts ) * interval '1 second'
-//              )
-//            ORDER BY m.enqueued_at ASC, m.message_id DESC
-//            LIMIT 1
-//          """.query(MessageRow.codec)
-//        )
-//        .use(ps => ps.option(defaultVisibilityTimeout ~ queueName ~ queueName))
 
     override def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
       ???
