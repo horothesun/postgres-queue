@@ -149,14 +149,14 @@ class DbClientITest extends CatsEffectSuite {
 
   test("get top message from queue name with lastReadAt outside visibility timeout") {
     val now = LocalDateTime.now()
-    val twiceTheVisibilityTimeout = 2 * queueVisibilityTimeoutA.value.toSeconds
+    val doubleVisibilityTimeout = 2 * queueVisibilityTimeoutA.value.toSeconds
     val messageRows = List(
       MessageRow(
         messageId1,
         queueNameA,
         MessageBody("body-01"),
         enqueuedAt = now.minusMinutes(120),
-        lastReadAt = Some(LocalDateTime.now().minusSeconds(twiceTheVisibilityTimeout)),
+        lastReadAt = Some(LocalDateTime.now().minusSeconds(doubleVisibilityTimeout)),
         dequeuedAt = None
       ),
       MessageRow(
