@@ -19,7 +19,7 @@ docker run \
   "postgres:${POSTGRES_VERSION}"
 
 echo "Waiting for Postgres to be ready..."
-sleep 2
+sleep 3
 
 echo "Creating DB..."
 psql \
