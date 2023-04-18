@@ -1,15 +1,15 @@
-import sbt._
+import sbt.*
 import sbt.Keys.libraryDependencies
 
 object Dependencies {
 
   object Version {
-    val catsEffect = "3.4.0"
+    val catsEffect = "3.4.9"
     val betterMonadicFor = "0.3.1"
-    val fs2 = "3.3.0"
-    val circe = "0.14.2"
-    val skunk = "0.3.1"
-    val logbackClassic = "1.4.0"
+    val fs2 = "3.6.1"
+    val circe = "0.14.5"
+    val skunk = "0.5.1"
+    val logbackClassic = "1.4.6"
     val munit = "0.7.29"
     val munitCatsEffect3 = "1.0.7"
   }
