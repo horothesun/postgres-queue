@@ -82,7 +82,7 @@ object DbClient {
             WHERE queue_name = ${QueueName.codec}
           """.query(QueueRow.codec)
         )
-        .map(ps => ps.option(queueName))
+        .flatMap(ps => ps.option(queueName))
 
     override def getTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
       session
@@ -105,7 +105,7 @@ object DbClient {
             LIMIT 1
           """.query(MessageRow.codec)
         )
-        .map(ps => ps.option(defaultVisibilityTimeout ~ queueName ~ queueName))
+        .flatMap(ps => ps.option(defaultVisibilityTimeout ~ queueName ~ queueName))
 
     override def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
       ???
