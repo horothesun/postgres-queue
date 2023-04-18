@@ -48,13 +48,13 @@ object DbClient {
     override def insertQueue(queue: QueueRow): IO[Unit] =
       session
         .prepare(sql"INSERT INTO queues VALUES (${QueueRow.codec})".command)
-        .use(_.execute(queue))
+        .flatMap(_.execute(queue))
         .void
 
     override def insertMessage(message: MessageRow): IO[Unit] =
       session
         .prepare(sql"INSERT INTO messages VALUES (${MessageRow.codec})".command)
-        .use(_.execute(message))
+        .flatMap(_.execute(message))
         .void
 
     override def getAllQueues: IO[List[QueueRow]] =
@@ -83,7 +83,7 @@ object DbClient {
             WHERE queue_name = ${QueueName.codec}
           """.query(QueueRow.codec)
         )
-        .use(ps => ps.option(queueName))
+        .flatMap(ps => ps.option(queueName))
 
     override def getTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
       session
@@ -106,7 +106,7 @@ object DbClient {
             LIMIT 1
           """.query(MessageRow.codec)
         )
-        .use(ps => ps.option(defaultVisibilityTimeout ~ queueName ~ queueName))
+        .flatMap(ps => ps.option(defaultVisibilityTimeout ~ queueName ~ queueName))
 
     override def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
       ???
