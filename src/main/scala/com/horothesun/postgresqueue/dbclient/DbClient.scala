@@ -5,7 +5,6 @@ import com.horothesun.postgresqueue.dbclient.Models._
 import com.horothesun.postgresqueue.Models._
 import skunk.implicits._
 import skunk.Session
-
 import scala.concurrent.duration.DurationInt
 
 /*
@@ -48,13 +47,13 @@ object DbClient {
     override def insertQueue(queue: QueueRow): IO[Unit] =
       session
         .prepare(sql"INSERT INTO queues VALUES (${QueueRow.codec})".command)
-        .use(_.execute(queue))
+        .map(_.execute(queue))
         .void
 
     override def insertMessage(message: MessageRow): IO[Unit] =
       session
         .prepare(sql"INSERT INTO messages VALUES (${MessageRow.codec})".command)
-        .use(_.execute(message))
+        .map(_.execute(message))
         .void
 
     override def getAllQueues: IO[List[QueueRow]] =
@@ -83,7 +82,7 @@ object DbClient {
             WHERE queue_name = ${QueueName.codec}
           """.query(QueueRow.codec)
         )
-        .use(ps => ps.option(queueName))
+        .map(ps => ps.option(queueName))
 
     override def getTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
       session
@@ -106,7 +105,7 @@ object DbClient {
             LIMIT 1
           """.query(MessageRow.codec)
         )
-        .use(ps => ps.option(defaultVisibilityTimeout ~ queueName ~ queueName))
+        .map(ps => ps.option(defaultVisibilityTimeout ~ queueName ~ queueName))
 
     override def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
       ???
