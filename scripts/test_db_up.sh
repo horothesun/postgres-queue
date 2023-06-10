@@ -2,7 +2,7 @@
 
 export PGPASSWORD="test_pwd"
 
-POSTGRES_VERSION="15.0-alpine3.16"
+POSTGRES_VERSION="15.3-alpine3.18"
 TEST_DEFAULT_USER="postgres"
 TEST_DB_HOST="localhost"
 TEST_CONTAINER="test-postgres"

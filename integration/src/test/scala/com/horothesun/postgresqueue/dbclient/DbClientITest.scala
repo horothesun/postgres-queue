@@ -1,13 +1,12 @@
 package com.horothesun.postgresqueue.dbclient
 
-import com.horothesun.postgresqueue.dbclient.Models._
 import com.horothesun.postgresqueue.Models._
-import com.horothesun.postgresqueue.dbclient.DbClientITest._
 import com.horothesun.postgresqueue.TestDbClient._
+import java.time.{LocalDateTime, ZoneOffset}
 import munit.CatsEffectSuite
-
-import java.time.LocalDateTime
 import scala.concurrent.duration.DurationInt
+import DbClientITest._
+import Models._
 
 class DbClientITest extends CatsEffectSuite {
 
@@ -26,24 +25,24 @@ class DbClientITest extends CatsEffectSuite {
         messageId1,
         queueNameA,
         MessageBody("body-01"),
-        enqueuedAt = LocalDateTime.of(2022, 9, 24, 18, 54, 0),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = LocalDateTime.of(2022, 9, 24, 18, 54, 0),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId2,
         queueNameB,
         MessageBody("body-02"),
-        enqueuedAt = LocalDateTime.of(2022, 9, 24, 18, 55, 0),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = LocalDateTime.of(2022, 9, 24, 18, 55, 0),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       )
     )
     selfCleaningDbClient.use { db =>
       for {
         _ <- populateQueues(db, queueRows)
         _ <- populateMessages(db, messageRows)
-        ms <- db.getAllMessages
+        ms <- db.getAllMessagesAcrossQueues
       } yield ms.toSet
     }.assertEquals(messageRows.toSet)
   }
@@ -63,33 +62,33 @@ class DbClientITest extends CatsEffectSuite {
         messageId1,
         queueNameA,
         MessageBody("body-01"),
-        enqueuedAt = LocalDateTime.of(2022, 9, 24, 18, 54, 0),
-        lastReadAt = None,
-        dequeuedAt = Some(LocalDateTime.of(2022, 9, 25, 0, 0, 0))
+        enqueuedAtUtc = LocalDateTime.of(2022, 9, 24, 18, 54, 0),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = Some(LocalDateTime.of(2022, 9, 25, 0, 0, 0))
       ),
       MessageRow(
         messageId2,
         queueNameB,
         MessageBody("body-02"),
-        enqueuedAt = LocalDateTime.of(2022, 9, 24, 18, 55, 0),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = LocalDateTime.of(2022, 9, 24, 18, 55, 0),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId3,
         queueNameA,
         MessageBody("body-03"),
-        enqueuedAt = LocalDateTime.of(2022, 9, 24, 18, 56, 0),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = LocalDateTime.of(2022, 9, 24, 18, 56, 0),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId4,
         queueNameA,
         MessageBody("body-04"),
-        enqueuedAt = LocalDateTime.of(2022, 9, 24, 18, 57, 0),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = LocalDateTime.of(2022, 9, 24, 18, 57, 0),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       )
     )
     selfCleaningDbClient.use { db =>
@@ -102,40 +101,40 @@ class DbClientITest extends CatsEffectSuite {
   }
 
   test("get top message from queue name with lastReadAt within visibility timeout") {
-    val now = LocalDateTime.now()
+    val now = nowUtc()
     val tenPercentOfVisibilityTimeout = (queueVisibilityTimeoutA.value.toSeconds * 0.1).round
     val messageRows = List(
       MessageRow(
         messageId1,
         queueNameA,
         MessageBody("body-01"),
-        enqueuedAt = now.minusMinutes(120),
-        lastReadAt = Some(LocalDateTime.now().minusSeconds(tenPercentOfVisibilityTimeout)),
-        dequeuedAt = None
+        enqueuedAtUtc = now.minusMinutes(120),
+        lastReadAtUtc = Some(now.minusSeconds(tenPercentOfVisibilityTimeout)),
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId2,
         queueNameB,
         MessageBody("body-02"),
-        enqueuedAt = now.minusMinutes(119),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = now.minusMinutes(119),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId3,
         queueNameA,
         MessageBody("body-03"),
-        enqueuedAt = now.minusMinutes(118),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = now.minusMinutes(118),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId4,
         queueNameA,
         MessageBody("body-04"),
-        enqueuedAt = now.minusMinutes(117),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = now.minusMinutes(117),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       )
     )
     selfCleaningDbClient.use { db =>
@@ -148,40 +147,40 @@ class DbClientITest extends CatsEffectSuite {
   }
 
   test("get top message from queue name with lastReadAt outside visibility timeout") {
-    val now = LocalDateTime.now()
-    val doubleVisibilityTimeout = 2 * queueVisibilityTimeoutA.value.toSeconds
+    val now = nowUtc()
+    val twiceVisibilityTimeout = 2 * queueVisibilityTimeoutA.value.toSeconds
     val messageRows = List(
       MessageRow(
         messageId1,
         queueNameA,
         MessageBody("body-01"),
-        enqueuedAt = now.minusMinutes(120),
-        lastReadAt = Some(LocalDateTime.now().minusSeconds(doubleVisibilityTimeout)),
-        dequeuedAt = None
+        enqueuedAtUtc = now.minusMinutes(120),
+        lastReadAtUtc = Some(now.minusSeconds(twiceVisibilityTimeout)),
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId2,
         queueNameB,
         MessageBody("body-02"),
-        enqueuedAt = now.minusMinutes(119),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = now.minusMinutes(119),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId3,
         queueNameA,
         MessageBody("body-03"),
-        enqueuedAt = now.minusMinutes(118),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = now.minusMinutes(118),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       ),
       MessageRow(
         messageId4,
         queueNameA,
         MessageBody("body-04"),
-        enqueuedAt = now.minusMinutes(117),
-        lastReadAt = None,
-        dequeuedAt = None
+        enqueuedAtUtc = now.minusMinutes(117),
+        lastReadAtUtc = None,
+        dequeuedAtUtc = None
       )
     )
     selfCleaningDbClient.use { db =>
@@ -196,6 +195,8 @@ class DbClientITest extends CatsEffectSuite {
 }
 
 object DbClientITest {
+
+  def nowUtc(): LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)
 
   val queueNameA: QueueName = QueueName("queue-A")
   val queueNameB: QueueName = QueueName("queue-B")

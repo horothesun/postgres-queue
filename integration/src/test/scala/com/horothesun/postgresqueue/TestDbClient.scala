@@ -2,8 +2,8 @@ package com.horothesun.postgresqueue
 
 import cats.effect._
 import cats.implicits._
-import com.horothesun.postgresqueue.dbclient.Models._
-import com.horothesun.postgresqueue.dbclient._
+import dbclient._
+import dbclient.Models._
 import natchez.Trace.Implicits.noop
 import skunk.implicits._
 import skunk.Session
@@ -12,8 +12,7 @@ object TestDbClient {
 
   val selfCleaningDbClient: Resource[IO, DbClient] =
     session.flatMap { s =>
-      val db = DbClient.create(s)
-      Resource.make(IO(()))(_ => truncateAllTables(s)).as(db)
+      Resource.make(IO.pure(DbClient.create(s)))(_ => truncateAllTables(s))
     }
 
   private def session: Resource[IO, Session[IO]] =
