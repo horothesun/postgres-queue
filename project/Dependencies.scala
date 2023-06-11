@@ -16,8 +16,6 @@ object Dependencies {
 
   lazy val project: Seq[ModuleID] = Seq(
     "org.typelevel" %% "cats-effect" % Version.catsEffect,
-    "org.typelevel" %% "cats-effect-kernel" % Version.catsEffect,
-    "org.typelevel" %% "cats-effect-std" % Version.catsEffect,
     compilerPlugin("com.olegpy" %% "better-monadic-for" % Version.betterMonadicFor),
     "co.fs2" %% "fs2-core" % Version.fs2,
     "org.tpolecat" %% "skunk-core" % Version.skunk,

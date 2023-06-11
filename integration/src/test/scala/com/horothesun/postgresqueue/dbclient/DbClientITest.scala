@@ -14,7 +14,7 @@ class DbClientITest extends CatsEffectSuite {
     selfCleaningDbClient.use { db =>
       for {
         _ <- populateQueues(db, queueRows)
-        qs <- db.getAllQueues
+        qs <- db.getAllQueues.compile.toList
       } yield qs.toSet
     }.assertEquals(queueRows.toSet)
   }
@@ -42,7 +42,7 @@ class DbClientITest extends CatsEffectSuite {
       for {
         _ <- populateQueues(db, queueRows)
         _ <- populateMessages(db, messageRows)
-        ms <- db.getAllMessagesAcrossQueues
+        ms <- db.getAllMessagesAcrossQueues.compile.toList
       } yield ms.toSet
     }.assertEquals(messageRows.toSet)
   }

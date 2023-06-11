@@ -1,10 +1,11 @@
 package com.horothesun.postgresqueue.dbclient
 
 import cats.effect._
+import cats.implicits._
 import com.horothesun.postgresqueue.Models._
+import fs2.Stream
 import skunk._
 import skunk.implicits._
-import scala.concurrent.duration.DurationInt
 import Models._
 
 /*
@@ -32,9 +33,9 @@ LIMIT 1;
 trait DbClient {
   def insertQueue(queue: QueueRow): IO[Unit]
   def insertMessage(message: MessageRow): IO[Unit]
-  def getAllQueues: IO[List[QueueRow]]
-  def getAllMessagesAcrossQueues: IO[List[MessageRow]]
-  def getAllMessages(queueName: QueueName): IO[List[MessageRow]]
+  def getAllQueues: Stream[IO, QueueRow]
+  def getAllMessagesAcrossQueues: Stream[IO, MessageRow]
+  def getAllMessages(queueName: QueueName): Stream[IO, MessageRow]
   def getQueue(queueName: QueueName): IO[Option[QueueRow]]
   def getTopMessage(queueName: QueueName): IO[Option[MessageRow]]
   def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]]
@@ -42,83 +43,101 @@ trait DbClient {
 
 object DbClient {
 
-  def create(session: Session[IO]): DbClient = new DbClient {
+  val insertQueueCommand: Command[QueueRow] =
+    sql"INSERT INTO queues VALUES (${QueueRow.codec})".command
 
-    val defaultVisibilityTimeout: QueueVisibilityTimeout = QueueVisibilityTimeout(10.seconds)
+  val insertMessageCommand: Command[MessageRow] =
+    sql"INSERT INTO messages VALUES (${MessageRow.codec})".command
 
-    override def insertQueue(queue: QueueRow): IO[Unit] =
-      session
-        .execute(sql"INSERT INTO queues VALUES (${QueueRow.codec})".command)(queue)
-        .void
+  val allQueuesQuery: Query[Void, QueueRow] =
+    sql"""
+      SELECT queue_name, visibility_timeout_sec
+      FROM queues
+    """.query(QueueRow.codec)
 
-    override def insertMessage(message: MessageRow): IO[Unit] =
-      session
-        .execute(sql"INSERT INTO messages VALUES (${MessageRow.codec})".command)(message)
-        .void
+  val allMessagesAcrossQueuesQuery: Query[Void, MessageRow] =
+    sql"""
+      SELECT message_id, queue_name, body, enqueued_at, last_read_at, dequeued_at
+      FROM messages
+      ORDER BY enqueued_at ASC, message_id DESC
+    """.query(MessageRow.codec)
 
-    override def getAllQueues: IO[List[QueueRow]] =
-      session.execute(
-        sql"""
-          SELECT queue_name, visibility_timeout_sec
-          FROM queues
-        """
-          .query(QueueRow.codec)
+  val allMessagesQuery: Query[QueueName, MessageRow] =
+    sql"""
+      SELECT message_id, queue_name, body, enqueued_at, last_read_at, dequeued_at
+      FROM messages
+      WHERE queue_name = ${QueueName.codec}
+      ORDER BY enqueued_at ASC, message_id DESC
+    """.query(MessageRow.codec)
+
+  val queueQuery: Query[QueueName, QueueRow] =
+    sql"""
+      SELECT queue_name, visibility_timeout_sec
+      FROM queues
+      WHERE queue_name = ${QueueName.codec}
+    """.query(QueueRow.codec)
+
+  val topMessageQuery: Query[QueueVisibilityTimeout *: QueueName *: QueueName *: EmptyTuple, MessageRow] =
+    sql"""
+      WITH vts AS (
+        SELECT COALESCE(visibility_timeout_sec, ${QueueVisibilityTimeout.codec}) AS visibility_timeout_sec
+        FROM queues
+        WHERE queue_name = ${QueueName.codec}
       )
+      SELECT message_id, queue_name, body, enqueued_at, last_read_at, dequeued_at
+      FROM messages AS m
+      WHERE m.queue_name = ${QueueName.codec}
+        AND m.dequeued_at IS NULL
+        AND (
+             m.last_read_at IS NULL
+          OR EXTRACT(EPOCH FROM TIMEZONE('UTC', NOW())) - EXTRACT(EPOCH FROM TIMEZONE('UTC', m.last_read_at)) > ( SELECT * FROM vts )
+        )
+      ORDER BY m.enqueued_at ASC, m.message_id DESC
+      LIMIT 1
+    """.query(MessageRow.codec)
 
-    override def getAllMessagesAcrossQueues: IO[List[MessageRow]] =
-      session.execute(
-        sql"""
-          SELECT message_id, queue_name, body, enqueued_at, last_read_at, dequeued_at
-          FROM messages
-          ORDER BY enqueued_at ASC, message_id DESC
-        """.query(MessageRow.codec)
-      )
+  def create(session: Session[IO], defaultVisibilityTimeout: QueueVisibilityTimeout): IO[DbClient] =
+    (
+      session.prepare(insertQueueCommand),
+      session.prepare(insertMessageCommand),
+      session.prepare(allQueuesQuery),
+      session.prepare(allMessagesAcrossQueuesQuery),
+      session.prepare(allMessagesQuery),
+      session.prepare(queueQuery),
+      session.prepare(topMessageQuery)
+    ).parTupled.map {
+      case (
+            insertQueuePrep,
+            insertMessagePrep,
+            allQueuesPrep,
+            allMessagesAcrossQueuesPrep,
+            allMessagesPrep,
+            queuePrep,
+            topMessagePrep
+          ) =>
+        new DbClient {
 
-    override def getAllMessages(queueName: QueueName): IO[List[MessageRow]] =
-      session.execute(
-        sql"""
-            SELECT message_id, queue_name, body, enqueued_at, last_read_at, dequeued_at
-            FROM messages
-            WHERE queue_name = ${QueueName.codec}
-            ORDER BY enqueued_at ASC, message_id DESC
-          """.query(MessageRow.codec)
-      )(queueName)
+          override def insertQueue(queue: QueueRow): IO[Unit] = insertQueuePrep.execute(queue).void
 
-    override def getQueue(queueName: QueueName): IO[Option[QueueRow]] =
-      session
-        .option(
-          sql"""
-            SELECT queue_name, visibility_timeout_sec
-            FROM queues
-            WHERE queue_name = ${QueueName.codec}
-          """.query(QueueRow.codec)
-        )(queueName)
+          override def insertMessage(message: MessageRow): IO[Unit] = insertMessagePrep.execute(message).void
 
-    override def getTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
-      session
-        .option(
-          sql"""
-            WITH vts AS (
-              SELECT COALESCE(visibility_timeout_sec, ${QueueVisibilityTimeout.codec}) AS visibility_timeout_sec
-              FROM queues
-              WHERE queue_name = ${QueueName.codec}
-            )
-            SELECT message_id, queue_name, body, enqueued_at, last_read_at, dequeued_at
-            FROM messages AS m
-            WHERE m.queue_name = ${QueueName.codec}
-              AND m.dequeued_at IS NULL
-              AND (
-                   m.last_read_at IS NULL
-                OR EXTRACT(EPOCH FROM TIMEZONE('UTC', NOW())) - EXTRACT(EPOCH FROM TIMEZONE('UTC', m.last_read_at)) > ( SELECT * FROM vts )
-              )
-            ORDER BY m.enqueued_at ASC, m.message_id DESC
-            LIMIT 1
-          """.query(MessageRow.codec)
-        )(defaultVisibilityTimeout, queueName, queueName)
+          override def getAllQueues: Stream[IO, QueueRow] = allQueuesPrep.stream(Void, chunkSize = 64)
 
-    override def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
-      ???
+          override def getAllMessagesAcrossQueues: Stream[IO, MessageRow] =
+            allMessagesAcrossQueuesPrep.stream(Void, chunkSize = 64)
 
-  }
+          override def getAllMessages(queueName: QueueName): Stream[IO, MessageRow] =
+            allMessagesPrep.stream(queueName, chunkSize = 64)
+
+          override def getQueue(queueName: QueueName): IO[Option[QueueRow]] = queuePrep.option(queueName)
+
+          override def getTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
+            topMessagePrep.option((defaultVisibilityTimeout, queueName, queueName))
+
+          override def getAndRemoveTopMessage(queueName: QueueName): IO[Option[MessageRow]] =
+            ???
+
+        }
+    }
 
 }
