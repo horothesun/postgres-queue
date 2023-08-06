@@ -1,0 +1,12 @@
+pull_request_rules:
+- name: Automatically merge Scala Steward PRs
+  conditions:
+  - author=horothesun-scala-steward
+  - "#approved-reviews-by>=1"
+  - status-success=unit-tests
+  - status-success=integration-tests
+  - status-success=shellcheck
+  - status-success=lint
+  actions:
+    merge:
+      method: squash
