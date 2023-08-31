@@ -6,7 +6,7 @@ object Dependencies {
   object Version {
     val catsEffect = "3.5.1"
     val betterMonadicFor = "0.3.1"
-    val fs2 = "3.9.0"
+    val fs2 = "3.9.1"
     val circe = "0.14.6"
     val skunk = "0.6.0"
     val logbackClassic = "1.4.11"
