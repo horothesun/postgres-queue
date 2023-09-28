@@ -4,7 +4,7 @@ import sbt.Keys.libraryDependencies
 object Dependencies {
 
   object Version {
-    val catsEffect = "3.5.1"
+    val catsEffect = "3.5.2"
     val betterMonadicFor = "0.3.1"
     val fs2 = "3.9.2"
     val circe = "0.14.6"
