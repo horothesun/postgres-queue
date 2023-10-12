@@ -8,7 +8,7 @@ object Dependencies {
     val betterMonadicFor = "0.3.1"
     val fs2 = "3.9.2"
     val circe = "0.14.6"
-    val skunk = "0.6.0"
+    val skunk = "0.6.1"
     val logbackClassic = "1.4.11"
     val munit = "0.7.29"
     val munitCatsEffect3 = "1.0.7"
