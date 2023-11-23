@@ -3,7 +3,9 @@ pull_request_rules:
 - name: Automatically approve Scala Steward PRs
   conditions: &base_merge_conditions
   - author=horothesun-scala-steward[bot]
-  - status-success=test
+  - status-success=unit-tests
+  - status-success=integration-tests
+  - status-success=shellcheck
   - status-success=lint
   actions:
     review:
