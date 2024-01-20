@@ -9,7 +9,7 @@ object Dependencies {
 
     val betterMonadicFor = "0.3.1"
 
-    val fs2 = "3.9.3"
+    val fs2 = "3.9.4"
 
     val circe = "0.14.6"
 
