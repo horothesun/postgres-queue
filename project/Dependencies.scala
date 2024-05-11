@@ -13,7 +13,7 @@ object Dependencies {
 
     val circe = "0.14.7"
 
-    val skunk = "0.6.3"
+    val skunk = "0.6.4"
 
     val logbackClassic = "1.5.6"
 
