@@ -19,7 +19,7 @@ object Dependencies {
 
     val munit = "1.0.0"
 
-    val munitCatsEffect3 = "1.0.7"
+    val munitCatsEffect3 = "2.0.0"
 
   }
 
@@ -38,7 +38,7 @@ object Dependencies {
   lazy val test: Seq[ModuleID] = List(
     "io.circe" %% "circe-parser" % Version.circe,
     "org.scalameta" %% "munit-scalacheck" % Version.munit,
-    "org.typelevel" %% "munit-cats-effect-3" % Version.munitCatsEffect3
+    "org.typelevel" %% "munit-cats-effect" % Version.munitCatsEffect3
   ).map(_ % Test)
 
   lazy val core = libraryDependencies ++= (project ++ logs ++ test)
