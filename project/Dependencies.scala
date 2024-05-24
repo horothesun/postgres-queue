@@ -17,7 +17,7 @@ object Dependencies {
 
     val logbackClassic = "1.5.6"
 
-    val munit = "0.7.29"
+    val munit = "1.0.0"
 
     val munitCatsEffect3 = "2.0.0"
 
