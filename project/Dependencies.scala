@@ -11,7 +11,7 @@ object Dependencies {
 
     val fs2 = "3.10.2"
 
-    val circe = "0.14.7"
+    val circe = "0.14.8"
 
     val skunk = "0.6.4"
 
