@@ -5,6 +5,8 @@ object Dependencies {
 
   object Version {
 
+    val cats = "2.12.0"
+
     val catsEffect = "3.5.4"
 
     val betterMonadicFor = "0.3.1"
@@ -19,11 +21,18 @@ object Dependencies {
 
     val munit = "1.0.0"
 
-    val munitCatsEffect3 = "2.0.0"
+    val munitCatsEffect = "2.0.0"
+
+    val munitScalacheck = "1.0.0"
+
+    val scalacheck = "1.18.0"
+
+    val scalacheckEffectMunit = "1.0.4"
 
   }
 
   lazy val project: Seq[ModuleID] = Seq(
+    "org.typelevel" %% "cats-core" % Version.cats,
     "org.typelevel" %% "cats-effect" % Version.catsEffect,
     compilerPlugin("com.olegpy" %% "better-monadic-for" % Version.betterMonadicFor),
     "co.fs2" %% "fs2-core" % Version.fs2,
@@ -37,8 +46,11 @@ object Dependencies {
 
   lazy val test: Seq[ModuleID] = List(
     "io.circe" %% "circe-parser" % Version.circe,
-    "org.scalameta" %% "munit-scalacheck" % Version.munit,
-    "org.typelevel" %% "munit-cats-effect" % Version.munitCatsEffect3
+    "org.typelevel" %% "munit-cats-effect" % Version.munitCatsEffect,
+    "org.scalameta" %% "munit-scalacheck" % Version.munitScalacheck,
+    "org.scalacheck" %% "scalacheck" % Version.scalacheck,
+    "org.typelevel" %% "scalacheck-effect-munit" % Version.scalacheckEffectMunit,
+    "org.typelevel" %% "cats-effect-testkit" % Version.catsEffect
   ).map(_ % Test)
 
   lazy val core = libraryDependencies ++= (project ++ logs ++ test)

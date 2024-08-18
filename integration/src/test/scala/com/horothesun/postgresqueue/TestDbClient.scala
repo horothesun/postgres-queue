@@ -1,13 +1,13 @@
 package com.horothesun.postgresqueue
 
 import cats.effect._
-import cats.implicits._
+import cats.syntax.all._
 import com.horothesun.postgresqueue.Models._
 import dbclient._
 import dbclient.Models._
 import natchez.Trace.Implicits.noop
 import scala.concurrent.duration.DurationInt
-import skunk.implicits._
+import skunk.syntax.all._
 import skunk.Session
 
 object TestDbClient {
