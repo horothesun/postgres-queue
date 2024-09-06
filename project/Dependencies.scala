@@ -17,7 +17,7 @@ object Dependencies {
 
     val skunk = "0.6.4"
 
-    val logbackClassic = "1.5.7"
+    val logbackClassic = "1.5.8"
 
     val munit = "1.0.0"
 
