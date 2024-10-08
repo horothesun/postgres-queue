@@ -2,8 +2,8 @@ package com.horothesun.postgresqueue.dbclient
 
 import com.horothesun.postgresqueue.Models._
 import java.time.LocalDateTime
-import skunk.codec.all._
 import skunk.Codec
+import skunk.codec.all._
 
 object Models {
 

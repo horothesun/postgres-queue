@@ -1,12 +1,12 @@
 package com.horothesun.postgresqueue.dbclient
 
+import Models._
 import cats.effect._
 import cats.syntax.all._
 import com.horothesun.postgresqueue.Models._
 import fs2.Stream
 import skunk._
 import skunk.syntax.all._
-import Models._
 
 /*
 

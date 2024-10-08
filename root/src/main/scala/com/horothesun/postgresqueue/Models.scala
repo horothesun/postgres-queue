@@ -1,8 +1,8 @@
 package com.horothesun.postgresqueue
 
-import skunk.codec.all._
-import skunk.Codec
 import scala.concurrent.duration._
+import skunk.Codec
+import skunk.codec.all._
 
 object Models {
 

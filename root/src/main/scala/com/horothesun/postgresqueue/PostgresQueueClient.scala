@@ -1,7 +1,7 @@
 package com.horothesun.postgresqueue
 
-import cats.effect.IO
 import Models._
+import cats.effect.IO
 
 trait PostgresQueueClient {
   def createQueue(queueName: QueueName): IO[Unit]

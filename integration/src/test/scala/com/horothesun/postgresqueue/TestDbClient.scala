@@ -7,8 +7,8 @@ import dbclient._
 import dbclient.Models._
 import natchez.Trace.Implicits.noop
 import scala.concurrent.duration.DurationInt
-import skunk.syntax.all._
 import skunk.Session
+import skunk.syntax.all._
 
 object TestDbClient {
 

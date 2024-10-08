@@ -1,12 +1,12 @@
 package com.horothesun.postgresqueue.dbclient
 
+import DbClientITest._
+import Models._
 import com.horothesun.postgresqueue.Models._
 import com.horothesun.postgresqueue.TestDbClient._
 import java.time.{LocalDateTime, ZoneOffset}
 import munit.CatsEffectSuite
 import scala.concurrent.duration.DurationInt
-import DbClientITest._
-import Models._
 
 class DbClientITest extends CatsEffectSuite {
 
