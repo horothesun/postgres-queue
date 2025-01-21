@@ -27,10 +27,10 @@ object TestDbClient {
     )
 
   def populateQueues(db: DbClient, rs: List[QueueRow]): IO[Unit] =
-    rs.traverse_(db.insertQueue)
+    rs.traverseVoid(db.insertQueue)
 
   def populateMessages(db: DbClient, rs: List[MessageRow]): IO[Unit] =
-    rs.traverse_(db.insertMessage)
+    rs.traverseVoid(db.insertMessage)
 
   private def truncateAllTables(s: Session[IO]): IO[Unit] =
     s.execute(sql"TRUNCATE TABLE queues, messages".command).void
