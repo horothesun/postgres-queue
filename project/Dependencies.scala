@@ -23,7 +23,7 @@ object Dependencies {
 
     val munitCatsEffect = "2.0.0"
 
-    val munitScalacheck = "1.0.0"
+    val munitScalacheck = "1.1.0"
 
     val scalacheck = "1.18.1"
 
