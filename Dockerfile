@@ -5,7 +5,7 @@
 # Integration tests use the following POSTGRES_VERSION value (through `scripts/get_postgres_version.sh`).
 # The CI uses the following JAVA_VERSION value to configure its JDK setup (through `scripts/get_java_version.sh`).
 
-ARG POSTGRES_VERSION=18.0-alpine
+ARG POSTGRES_VERSION=18.1-alpine
 
 ARG JAVA_VERSION=25
 
