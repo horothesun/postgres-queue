@@ -1,6 +1,6 @@
 ThisBuild / organization := "com.horothesun"
 ThisBuild / organizationName := "horothesun"
-ThisBuild / scalaVersion := "2.13.17"
+ThisBuild / scalaVersion := "2.13.18"
 
 scalacOptions ++= Seq("-deprecation", "-feature")
 
