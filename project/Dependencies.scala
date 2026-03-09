@@ -27,7 +27,7 @@ object Dependencies {
 
     val scalacheck = "1.19.0"
 
-    val scalacheckEffectMunit = "1.0.4"
+    val scalacheckEffectMunit = "2.1.0"
 
   }
 
