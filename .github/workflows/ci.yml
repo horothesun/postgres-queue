@@ -44,7 +44,7 @@ jobs:
     - uses: sbt/setup-sbt@v1
 
     - name: Run unit tests
-      run: sbt root/test
+      run: sbt root/testFull
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -86,7 +86,7 @@ jobs:
       - uses: sbt/setup-sbt@v1
 
       - name: Check
-        run: sbt scalafmtSbtCheck scalafmtCheck Test/scalafmtCheck
+        run: sbt ";scalafmtSbtCheck" ";scalafmtCheck" ";Test/scalafmtCheck"
 
   build-dockerfile:
     runs-on: ubuntu-latest

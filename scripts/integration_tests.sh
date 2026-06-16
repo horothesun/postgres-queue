@@ -3,7 +3,7 @@
 source scripts/get_postgres_version.sh
 ./scripts/test_db_up.sh
 
-sbt integration/test
+sbt integration/testFull
 TESTS_EXIT_CODE="$?"
 
 ./scripts/test_db_down.sh
